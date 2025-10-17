@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Testing Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            background: #fafbfc;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .button.success {
+            background: linear-gradient(135deg, #48c78e 0%, #06d6a0 100%);
+        }
+        .button.danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        .log .error {
+            color: #e74c3c;
+        }
+        .log .success {
+            color: #2ecc71;
+        }
+        .log .warning {
+            color: #f39c12;
+        }
+        .log .info {
+            color: #3498db;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status.success {
+            background: #d5f4e6;
+            color: #27ae60;
+            border: 2px solid #2ecc71;
+        }
+        .status.error {
+            background: #fdf2f2;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+        .status.warning {
+            background: #fef9e7;
+            color: #f39c12;
+            border: 2px solid #f39c12;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e1e8ed;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .notification-type {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .domain-card {
+            border-left: 4px solid #3498db;
+        }
+        .domain-card.configured {
+            border-left-color: #2ecc71;
+        }
+        .domain-card.error {
+            border-left-color: #e74c3c;
+        }
+        .flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Notification Testing Dashboard</h1>
+            <p>Test Telegram notifications with mock data</p>
+        </div>
+
+        <!-- Auth Section -->
+        <div class="section">
+            <h3>🔐 Authentication</h3>
+            <div class="input-group">
+                <label for="jwtToken">JWT Token:</label>
+                <input type="password" id="jwtToken" placeholder="Enter your JWT token here...">
+            </div>
+            <button class="button" onclick="loadDashboard()">🔄 Load Dashboard</button>
+            <div class="status" id="authStatus" style="display: none;"></div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" style="display: none;">
+            
+            <!-- Supported Types Section -->
+            <div class="section">
+                <h3>📋 Supported Notification Types</h3>
+                <div id="supportedTypes">Loading...</div>
+                <button class="button" onclick="loadSupportedTypes()">🔄 Refresh Types</button>
+            </div>
+
+            <!-- Domains Section -->
+            <div class="section">
+                <h3>🌐 Domains with Chat Configurations</h3>
+                <div id="domainsContainer" class="grid">Loading...</div>
+                <button class="button" onclick="loadDomains()">🔄 Refresh Domains</button>
+            </div>
+
+            <!-- Test Single Notification -->
+            <div class="section">
+                <h3>🧪 Test Single Notification</h3>
+                <div class="flex">
+                    <div class="input-group" style="flex: 1; margin-right: 10px;">
+                        <label for="notificationType">Notification Type:</label>
+                        <select id="notificationType">
+                            <option value="">Select type...</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="flex: 1; margin-left: 10px;">
+                        <label for="domainSelect">Domain (optional):</label>
+                        <select id="domainSelect">
+                            <option value="">Auto-select first domain with chats</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="button" onclick="sendTestNotification()">📤 Send Test Notification</button>
+            </div>
+
+            <!-- Test All Notifications -->
+            <div class="section">
+                <h3>🚀 Test All Notification Types</h3>
+                <p>Send test notifications for all supported types to verify your Telegram bot configuration.</p>
+                <div class="input-group">
+                    <label for="allTestDomain">Domain (optional):</label>
+                    <select id="allTestDomain">
+                        <option value="">Auto-select first domain with chats</option>
+                    </select>
+                </div>
+                <button class="button success" onclick="sendAllTestNotifications()">🎯 Send All Test Notifications</button>
+                <div id="allTestResults" style="display: none; margin-top: 20px;"></div>
+            </div>
+
+        </div>
+
+        <!-- Logs Section -->
+        <div class="section">
+            <h3>📊 Activity Logs</h3>
+            <button class="button danger" onclick="clearLogs()">🧹 Clear Logs</button>
+            <div class="log" id="logs"></div>
+        </div>
+    </div>
+
+    <script>
+        let jwtToken = '';
+        let supportedTypes = [];
+        let domains = [];
+
+        // Logging function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            const logElement = document.getElementById('logs');
+            const logClass = type;
+            logElement.innerHTML += `<span class="${logClass}">[${timestamp}] ${message}</span>\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Update status
+        function updateStatus(elementId, text, type = 'warning') {
+            const statusElement = document.getElementById(elementId);
+            statusElement.className = `status ${type}`;
+            statusElement.textContent = text;
+            statusElement.style.display = 'block';
+        }
+
+        // API request helper
+        async function apiRequest(endpoint, options = {}) {
+            if (!jwtToken) {
+                throw new Error('JWT token is required');
+            }
+
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const response = await fetch(`http://localhost:3000/admin/notifications${endpoint}`, {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                throw new Error(`HTTP ${response.status}: ${errorData.error || errorData.message || 'Unknown error'}`);
+            }
+
+            return response.json();
+        }
+
+        // Load dashboard
+        async function loadDashboard() {
+            jwtToken = document.getElementById('jwtToken').value.trim();
+            
+            if (!jwtToken) {
+                updateStatus('authStatus', '❌ Please enter JWT token', 'error');
+                return;
+            }
+
+            try {
+                updateStatus('authStatus', '🔄 Authenticating...', 'warning');
+                
+                // Test authentication by loading supported types
+                await loadSupportedTypes();
+                await loadDomains();
+                
+                updateStatus('authStatus', '✅ Authenticated successfully', 'success');
+                document.getElementById('dashboardContent').style.display = 'block';
+                
+                log('Dashboard loaded successfully', 'success');
+                
+            } catch (error) {
+                updateStatus('authStatus', `❌ Authentication failed: ${error.message}`, 'error');
+                log(`Authentication failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Load supported types
+        async function loadSupportedTypes() {
+            try {
+                log('Loading supported notification types...', 'info');
+                const response = await apiRequest('/types');
+                
+                supportedTypes = response.data.types;
+                
+                // Update UI
+                const typesContainer = document.getElementById('supportedTypes');
+                typesContainer.innerHTML = supportedTypes.map(type => 
+                    `<span class="notification-type">${type}</span>`
+                ).join(' ');
+                
+                // Update select options
+                const typeSelect = document.getElementById('notificationType');
+                typeSelect.innerHTML = '<option value="">Select type...</option>' + 
+                    supportedTypes.map(type => `<option value="${type}">${type}</option>`).join('');
+                
+                log(`Loaded ${supportedTypes.length} supported types`, 'success');
+                
+            } catch (error) {
+                document.getElementById('supportedTypes').innerHTML = `<span class="error">Error loading types: ${error.message}</span>`;
+                log(`Error loading supported types: ${error.message}`, 'error');
+            }
+        }
+
+        // Load domains
+        async function loadDomains() {
+            try {
+                log('Loading domains with chat configurations...', 'info');
+                const response = await apiRequest('/domains');
+                
+                domains = response.data.domains;
+                
+                // Update UI
+                const container = document.getElementById('domainsContainer');
+                if (domains.length === 0) {
+                    container.innerHTML = '<div class="card">No domains found</div>';
+                } else {
+                    container.innerHTML = domains.map(domain => {
+                        const hasChats = domain.chatsCount > 0;
+                        const cardClass = hasChats ? 'configured' : 'error';
+                        
+                        return `
+                            <div class="card domain-card ${cardClass}">
+                                <h4>${domain.domain}</h4>
+                                <p><strong>Worker:</strong> ${domain.worker_nickname}</p>
+                                <p><strong>Chats:</strong> ${domain.chatsCount}</p>
+                                <p><strong>Created:</strong> ${new Date(domain.created_at).toLocaleDateString()}</p>
+                                <button class="button" onclick="validateDomainChats(${domain.id})">
+                                    🔍 Validate Chats
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                // Update select options
+                const domainSelects = ['domainSelect', 'allTestDomain'];
+                domainSelects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    select.innerHTML = '<option value="">Auto-select first domain with chats</option>' +
+                        domains.map(domain => `<option value="${domain.id}">${domain.domain} (${domain.chatsCount} chats)</option>`).join('');
+                });
+                
+                log(`Loaded ${domains.length} domains`, 'success');
+                
+            } catch (error) {
+                document.getElementById('domainsContainer').innerHTML = `<div class="card error">Error loading domains: ${error.message}</div>`;
+                log(`Error loading domains: ${error.message}`, 'error');
+            }
+        }
+
+        // Validate domain chats
+        async function validateDomainChats(domainId) {
+            try {
+                log(`Validating chats for domain ID ${domainId}...`, 'info');
+                const response = await apiRequest(`/domains/${domainId}/validate`);
+                
+                const validation = response.data;
+                
+                let message = `Domain: ${validation.domain}\n`;
+                message += `Chats configured: ${validation.chatsConfigured}\n`;
+                message += `Chats count: ${validation.chatsCount}\n`;
+                
+                if (validation.parseError) {
+                    message += `Parse error: ${validation.parseError}\n`;
+                }
+                
+                validation.chats.forEach((chat, index) => {
+                    message += `\nChat ${index + 1}:\n`;
+                    message += `  Chat ID: ${chat.chat_id}\n`;
+                    message += `  Token: ${chat.token}\n`;
+                    message += `  Enabled types: ${chat.enabledTypes.join(', ')}\n`;
+                });
+                
+                alert(message);
+                log(`Validation completed for domain ${validation.domain}`, 'success');
+                
+            } catch (error) {
+                alert(`Validation failed: ${error.message}`);
+                log(`Error validating domain chats: ${error.message}`, 'error');
+            }
+        }
+
+        // Send test notification
+        async function sendTestNotification() {
+            const type = document.getElementById('notificationType').value;
+            const domainId = document.getElementById('domainSelect').value;
+            
+            if (!type) {
+                alert('Please select a notification type');
+                return;
+            }
+            
+            try {
+                log(`Sending test notification of type '${type}'...`, 'info');
+                
+                const body = { type };
+                if (domainId) {
+                    body.domainId = parseInt(domainId);
+                }
+                
+                const response = await apiRequest('/test', {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+                
+                log(`Test notification sent successfully: ${response.message}`, 'success');
+                log(`Domain: ${response.data.domain}`, 'info');
+                
+            } catch (error) {
+                log(`Error sending test notification: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Send all test notifications
+        async function sendAllTestNotifications() {
+            const domainId = document.getElementById('allTestDomain').value;
+            
+            try {
+                log('Sending all test notifications...', 'info');
+                
+                const body = {};
+                if (domainId) {
+                    body.domainId = parseInt(domainId);
+                }
+                
+                const response = await apiRequest('/test-all', {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+                
+                // Display results
+                const resultsContainer = document.getElementById('allTestResults');
+                resultsContainer.style.display = 'block';
+                
+                let resultsHtml = `<h4>Results for domain: ${response.data.domain}</h4>`;
+                resultsHtml += `<p>Total sent: ${response.data.totalSent}, Total failed: ${response.data.totalFailed}</p>`;
+                resultsHtml += '<div class="grid">';
+                
+                response.data.results.forEach(result => {
+                    const statusClass = result.status === 'success' ? 'success' : 'error';
+                    resultsHtml += `
+                        <div class="card">
+                            <h5>${result.type}</h5>
+                            <div class="status ${statusClass}">${result.status.toUpperCase()}</div>
+                            <p>${result.message}</p>
+                        </div>
+                    `;
+                });
+                
+                resultsHtml += '</div>';
+                resultsContainer.innerHTML = resultsHtml;
+                
+                log(`All test notifications completed. Sent: ${response.data.totalSent}, Failed: ${response.data.totalFailed}`, 'success');
+                
+            } catch (error) {
+                log(`Error sending all test notifications: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Clear logs
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+            log('Logs cleared', 'info');
+        }
+
+        // Initialize
+        window.onload = function() {
+            log('Notification Testing Dashboard initialized', 'info');
+        };
+    </script>
+</body>
+</html>

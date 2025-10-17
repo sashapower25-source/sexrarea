@@ -1,0 +1,48 @@
+{
+  "name": "mytronv2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "create-admin": "ts-node src/core/api/scripts/create-first-admin.ts",
+    "change-superadmin-password": "ts-node src/core/api/scripts/change-superadmin-password.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@daochild/tronweb-typescript": "^1.2.3",
+    "@types/crypto-js": "^4.2.2",
+    "@types/express": "^5.0.3",
+    "@types/geoip-country": "^4.0.2",
+    "@types/node": "^24.0.14",
+    "prisma": "^6.12.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@peculiar/webcrypto": "^1.5.0",
+    "@prisma/client": "^6.12.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@walletconnect/sign-client": "^2.21.5",
+    "bcryptjs": "^3.0.2",
+    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.1",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "geoip-country": "^5.0.202507152344",
+    "got": "^11.8.2",
+    "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
+    "node-polyfill-webpack-plugin": "^4.1.0",
+    "sqlite3": "^5.1.7",
+    "tronweb": "^6.0.3"
+  },
+  "_moduleAliases": {
+    "@": "src/"
+  }
+}
